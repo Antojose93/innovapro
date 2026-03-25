@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { isTauriApp } from '@/lib/tauri'
+import { resolveConversionFactor } from '@/lib/unitConversion'
 import type {
   ConversionResult,
   ConvertUnitsInput,
@@ -61,6 +62,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 10,
       currentCost: 18500,
+      currentCostUnitId: 10,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -70,6 +72,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 10,
       currentCost: 32500,
+      currentCostUnitId: 10,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -79,6 +82,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 10,
       currentCost: 38500,
+      currentCostUnitId: 10,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -88,6 +92,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 11,
       currentCost: 24000,
+      currentCostUnitId: 11,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -97,6 +102,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 11,
       currentCost: 48500,
+      currentCostUnitId: 11,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -106,6 +112,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 12,
       currentCost: 51500,
+      currentCostUnitId: 12,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -115,6 +122,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 1,
       purchaseUnitId: 13,
       currentCost: 112500,
+      currentCostUnitId: 13,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -124,6 +132,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 1,
       purchaseUnitId: 1,
       currentCost: 24000,
+      currentCostUnitId: 1,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -133,6 +142,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 1,
       purchaseUnitId: 13,
       currentCost: 130000,
+      currentCostUnitId: 13,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -142,6 +152,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 6,
       purchaseUnitId: 6,
       currentCost: 32000,
+      currentCostUnitId: 6,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -151,6 +162,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 6,
       purchaseUnitId: 6,
       currentCost: 57500,
+      currentCostUnitId: 6,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -160,6 +172,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 6,
       purchaseUnitId: 6,
       currentCost: 120000,
+      currentCostUnitId: 6,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -169,6 +182,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 5,
       currentCost: 5500,
+      currentCostUnitId: 5,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -178,6 +192,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 5,
       currentCost: 7500,
+      currentCostUnitId: 5,
       lastCostAt: '2026-03-24 09:00:00',
     },
     {
@@ -187,6 +202,7 @@ const mockSnapshot: MasterDataSnapshot = {
       stockUnitId: 5,
       purchaseUnitId: 5,
       currentCost: 4000,
+      currentCostUnitId: 5,
       lastCostAt: '2026-03-24 09:00:00',
     },
   ],
@@ -211,6 +227,8 @@ const mockSnapshot: MasterDataSnapshot = {
       productId: 1,
       status: 'active',
       version: 'v1',
+      outputQuantity: 1,
+      outputUnitId: 3,
       notes: 'Receta inicial',
       items: [
         {
@@ -352,52 +370,6 @@ const cloneSnapshot = (): MasterDataSnapshot => ({
   conversions: [...mockSnapshot.conversions],
 })
 
-const resolveFactor = (fromUnitId: number, toUnitId: number): number => {
-  if (fromUnitId === toUnitId) {
-    return 1
-  }
-
-  const graph = new Map<number, Array<{ to: number; factor: number }>>()
-
-  for (const conversion of mockSnapshot.conversions) {
-    graph.set(conversion.fromUnitId, [
-      ...(graph.get(conversion.fromUnitId) ?? []),
-      { to: conversion.toUnitId, factor: conversion.factor },
-    ])
-    graph.set(conversion.toUnitId, [
-      ...(graph.get(conversion.toUnitId) ?? []),
-      { to: conversion.fromUnitId, factor: 1 / conversion.factor },
-    ])
-  }
-
-  const queue: Array<{ unitId: number; factor: number }> = [{ unitId: fromUnitId, factor: 1 }]
-  const visited = new Set<number>([fromUnitId])
-
-  while (queue.length > 0) {
-    const current = queue.shift()
-
-    if (!current) {
-      break
-    }
-
-    if (current.unitId === toUnitId) {
-      return current.factor
-    }
-
-    for (const neighbor of graph.get(current.unitId) ?? []) {
-      if (!visited.has(neighbor.to)) {
-        visited.add(neighbor.to)
-        queue.push({
-          unitId: neighbor.to,
-          factor: current.factor * neighbor.factor,
-        })
-      }
-    }
-  }
-
-  throw new Error('No existe una conversion registrada entre esas unidades')
-}
-
 const desktopFallback = {
   async getMasterDataSnapshot(): Promise<MasterDataSnapshot> {
     return cloneSnapshot()
@@ -440,6 +412,7 @@ const desktopFallback = {
       stockUnitId: input.stockUnitId,
       purchaseUnitId: input.purchaseUnitId,
       currentCost: input.initialCost ?? null,
+      currentCostUnitId: input.initialCost ? input.initialCostUnitId ?? input.purchaseUnitId : null,
       lastCostAt: input.initialCost ? new Date().toISOString() : null,
     }
 
@@ -478,6 +451,7 @@ const desktopFallback = {
     const material = mockSnapshot.materials.find((item) => item.id === input.materialId)
     if (material) {
       material.currentCost = input.unitCost
+      material.currentCostUnitId = input.unitId
       material.lastCostAt = entry.effectiveAt
     }
 
@@ -554,6 +528,8 @@ const desktopFallback = {
       productId: input.productId ?? null,
       status: input.status,
       version: input.version.trim(),
+      outputQuantity: input.outputQuantity,
+      outputUnitId: input.outputUnitId,
       notes: input.notes?.trim() || null,
       items: input.items.map((item) => ({
         materialId: item.materialId,
@@ -575,6 +551,8 @@ const desktopFallback = {
       recipe.productId = input.productId ?? null
       recipe.status = input.status
       recipe.version = input.version.trim()
+      recipe.outputQuantity = input.outputQuantity
+      recipe.outputUnitId = input.outputUnitId
       recipe.notes = input.notes?.trim() || null
       recipe.items = input.items.map((item) => ({
         materialId: item.materialId,
@@ -631,7 +609,7 @@ const desktopFallback = {
   },
 
   async convertUnits(input: ConvertUnitsInput): Promise<ConversionResult> {
-    const factor = resolveFactor(input.fromUnitId, input.toUnitId)
+    const factor = resolveConversionFactor(input.fromUnitId, input.toUnitId, mockSnapshot.conversions)
 
     return {
       factor,

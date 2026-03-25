@@ -40,10 +40,11 @@ impl<'a> MasterDataRepository<'a> {
               materials.stock_unit_id,
               materials.purchase_unit_id,
               latest.unit_cost AS current_cost,
+              latest.unit_id AS current_cost_unit_id,
               latest.effective_at AS last_cost_at
             FROM materials
             LEFT JOIN (
-              SELECT mch.material_id, mch.unit_cost, mch.effective_at
+              SELECT mch.material_id, mch.unit_id, mch.unit_cost, mch.effective_at
               FROM material_cost_history mch
               INNER JOIN (
                 SELECT material_id, MAX(id) AS latest_id
@@ -124,12 +125,14 @@ impl<'a> MasterDataRepository<'a> {
             product_id: Option<i64>,
             status: String,
             version: String,
+            output_quantity: f64,
+            output_unit_id: i64,
             notes: Option<String>,
         }
 
         let rows = sqlx::query_as::<_, RecipeRow>(
             r#"
-            SELECT id, code, name, product_id, status, version, notes
+            SELECT id, code, name, product_id, status, version, output_quantity, output_unit_id, notes
             FROM recipes
             ORDER BY name ASC
             "#,
@@ -148,6 +151,8 @@ impl<'a> MasterDataRepository<'a> {
                 product_id: row.product_id,
                 status: row.status,
                 version: row.version,
+                output_quantity: row.output_quantity,
+                output_unit_id: row.output_unit_id,
                 notes: row.notes,
                 items: recipe_items
                     .iter()
@@ -424,8 +429,8 @@ impl<'a> MasterDataRepository<'a> {
 
         let result = sqlx::query(
             r#"
-            INSERT INTO recipes (code, name, product_id, status, version, notes)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO recipes (code, name, product_id, status, version, output_quantity, output_unit_id, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(&input.code)
@@ -433,6 +438,8 @@ impl<'a> MasterDataRepository<'a> {
         .bind(input.product_id)
         .bind(&input.status)
         .bind(&input.version)
+        .bind(input.output_quantity)
+        .bind(input.output_unit_id)
         .bind(&input.notes)
         .execute(&mut *transaction)
         .await?;
@@ -462,7 +469,7 @@ impl<'a> MasterDataRepository<'a> {
         sqlx::query(
             r#"
             UPDATE recipes
-            SET code = ?, name = ?, product_id = ?, status = ?, version = ?, notes = ?
+            SET code = ?, name = ?, product_id = ?, status = ?, version = ?, output_quantity = ?, output_unit_id = ?, notes = ?
             WHERE id = ?
             "#,
         )
@@ -471,6 +478,8 @@ impl<'a> MasterDataRepository<'a> {
         .bind(input.product_id)
         .bind(&input.status)
         .bind(&input.version)
+        .bind(input.output_quantity)
+        .bind(input.output_unit_id)
         .bind(&input.notes)
         .bind(input.id)
         .execute(&mut *transaction)

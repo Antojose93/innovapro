@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { desktopService } from '@/services/desktop'
-import type { ProductionTab } from '@/types/masterData'
-
-const productionTabs = ref<ProductionTab[]>([])
-
-onMounted(async () => {
-  productionTabs.value = await desktopService.listProductionTabs()
-})
+const productionTabs = [
+  {
+    key: 'ordenes',
+    label: 'Ordenes',
+    icon: 'mdi-clipboard-text-outline',
+    route: '/produccion/ordenes',
+  },
+  {
+    key: 'materiales',
+    label: 'Materiales',
+    icon: 'mdi-format-list-bulleted-square',
+    route: '/produccion/materiales',
+  },
+]
 </script>
 
 <template>
@@ -15,7 +20,7 @@ onMounted(async () => {
     <div class="mb-6">
       <h1 class="text-h4 mb-2">Produccion</h1>
       <p class="text-subtitle-1 text-medium-emphasis">
-        Administra las opciones principales del modulo de produccion desde una sola vista.
+        Planea ordenes, calcula requerimientos y consolida materiales desde las recetas tecnicas definidas en Maestros.
       </p>
     </div>
 

@@ -474,12 +474,24 @@ async fn validate_recipe_input(
         ));
     }
 
+    if input.output_quantity <= 0.0 {
+        return Err(AppError::Validation(
+            "El rendimiento de la receta debe ser mayor que cero".into(),
+        ));
+    }
+
     if let Some(product_id) = input.product_id {
         if !repository.product_exists(product_id).await? {
             return Err(AppError::Validation(
                 "El producto asociado a la receta no existe".into(),
             ));
         }
+    }
+
+    if !repository.unit_exists(input.output_unit_id).await? {
+        return Err(AppError::Validation(
+            "La unidad de rendimiento de la receta no existe".into(),
+        ));
     }
 
     validate_recipe_status(&input.status)?;
@@ -502,12 +514,24 @@ async fn validate_recipe_update_input(
         ));
     }
 
+    if input.output_quantity <= 0.0 {
+        return Err(AppError::Validation(
+            "El rendimiento de la receta debe ser mayor que cero".into(),
+        ));
+    }
+
     if let Some(product_id) = input.product_id {
         if !repository.product_exists(product_id).await? {
             return Err(AppError::Validation(
                 "El producto asociado a la receta no existe".into(),
             ));
         }
+    }
+
+    if !repository.unit_exists(input.output_unit_id).await? {
+        return Err(AppError::Validation(
+            "La unidad de rendimiento de la receta no existe".into(),
+        ));
     }
 
     validate_recipe_status(&input.status)?;

@@ -16,6 +16,7 @@ pub struct Material {
     pub stock_unit_id: i64,
     pub purchase_unit_id: i64,
     pub current_cost: Option<f64>,
+    pub current_cost_unit_id: Option<i64>,
     pub last_cost_at: Option<String>,
 }
 
@@ -69,6 +70,8 @@ pub struct Recipe {
     pub product_id: Option<i64>,
     pub status: String,
     pub version: String,
+    pub output_quantity: f64,
+    pub output_unit_id: i64,
     pub notes: Option<String>,
     pub items: Vec<RecipeItemPayload>,
 }
@@ -173,6 +176,8 @@ pub struct CreateRecipeInput {
     pub product_id: Option<i64>,
     pub status: String,
     pub version: String,
+    pub output_quantity: f64,
+    pub output_unit_id: i64,
     pub notes: Option<String>,
     pub items: Vec<RecipeItemPayload>,
 }
@@ -186,6 +191,8 @@ pub struct UpdateRecipeInput {
     pub product_id: Option<i64>,
     pub status: String,
     pub version: String,
+    pub output_quantity: f64,
+    pub output_unit_id: i64,
     pub notes: Option<String>,
     pub items: Vec<RecipeItemPayload>,
 }

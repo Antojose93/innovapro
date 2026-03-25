@@ -30,6 +30,7 @@ const resolveMaterialUnit = (materialId: number) => {
   return units.value.find((unit) => unit.id === material.stockUnitId)?.symbol ?? `#${material.stockUnitId}`
 }
 const resolveProductName = (productId: number | null) => products.value.find((product) => product.id === productId)?.name ?? 'Sin producto'
+const resolveUnitLabel = (unitId: number) => units.value.find((unit) => unit.id === unitId)?.symbol ?? `#${unitId}`
 </script>
 
 <template>
@@ -53,6 +54,7 @@ const resolveProductName = (productId: number | null) => products.value.find((pr
                 <th>Version</th>
                 <th>Estado</th>
                 <th>Producto</th>
+                <th>Rendimiento</th>
                 <th>Insumos</th>
                 <th>Cantidad total</th>
               </tr>
@@ -63,13 +65,14 @@ const resolveProductName = (productId: number | null) => products.value.find((pr
                 <td>{{ recipe.version }}</td>
                 <td>{{ resolveStatusLabel(recipe.status) }}</td>
                 <td>{{ resolveProductName(recipe.productId) }}</td>
+                <td>{{ recipe.outputQuantity }} {{ resolveUnitLabel(recipe.outputUnitId) }}</td>
                 <td>{{ recipe.ingredients }}</td>
                 <td>{{ recipe.totalQuantity }}</td>
               </tr>
               <tr v-if="recipesWithStats.length === 0">
-                <td colspan="6" class="text-center py-6 text-medium-emphasis">
-                  No hay recetas registradas.
-                </td>
+                  <td colspan="7" class="text-center py-6 text-medium-emphasis">
+                    No hay recetas registradas.
+                  </td>
               </tr>
             </tbody>
           </v-table>

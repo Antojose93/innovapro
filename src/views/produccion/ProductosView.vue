@@ -27,6 +27,11 @@ const resolveUnitLabel = (unitId: number) => units.value.find((unit) => unit.id 
 const resolveStatusLabel = (status: string) => status === 'active' ? 'Activo' : status === 'development' ? 'En desarrollo' : 'Inactivo'
 const resolveRecipe = (recipeId: number | null) => recipes.value.find((recipe) => recipe.id === recipeId) ?? null
 const resolveMaterialName = (materialId: number) => materials.value.find((material) => material.id === materialId)?.name ?? `#${materialId}`
+const resolveRecipeYield = (recipeId: number | null) => {
+  const recipe = resolveRecipe(recipeId)
+  if (!recipe) return 'Sin rendimiento'
+  return `${recipe.outputQuantity} ${resolveUnitLabel(recipe.outputUnitId)}`
+}
 </script>
 
 <template>
@@ -78,6 +83,7 @@ const resolveMaterialName = (materialId: number) => materials.value.find((materi
                 <th>Unidad</th>
                 <th>Estado</th>
                 <th>Receta</th>
+                <th>Rendimiento</th>
               </tr>
             </thead>
             <tbody>
@@ -87,9 +93,10 @@ const resolveMaterialName = (materialId: number) => materials.value.find((materi
                 <td>{{ resolveUnitLabel(product.unitId) }}</td>
                 <td>{{ resolveStatusLabel(product.status) }}</td>
                 <td>{{ resolveRecipe(product.recipeId)?.items.length ?? 0 }} insumo(s)</td>
+                <td>{{ resolveRecipeYield(product.recipeId) }}</td>
               </tr>
               <tr v-if="products.length === 0">
-                <td colspan="5" class="text-center py-6 text-medium-emphasis">
+                <td colspan="6" class="text-center py-6 text-medium-emphasis">
                   No hay productos registrados.
                 </td>
               </tr>

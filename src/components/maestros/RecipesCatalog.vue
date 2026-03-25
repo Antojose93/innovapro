@@ -9,7 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const masterDataStore = useMasterDataStore()
-const { products, recipes, saving } = storeToRefs(masterDataStore)
+const { products, recipes, saving, units } = storeToRefs(masterDataStore)
 
 const search = ref('')
 const deleteDialog = ref(false)
@@ -41,6 +41,7 @@ const confirmDelete = async () => {
 
 const resolveProductName = (productId: number | null) => products.value.find((product) => product.id === productId)?.name ?? 'Sin producto'
 const resolveStatusLabel = (status: string) => status === 'active' ? 'Activa' : status === 'development' ? 'En desarrollo' : 'Inactiva'
+const resolveUnitLabel = (unitId: number) => units.value.find((unit) => unit.id === unitId)?.symbol ?? `#${unitId}`
 </script>
 
 <template>
@@ -58,6 +59,7 @@ const resolveStatusLabel = (status: string) => status === 'active' ? 'Activa' : 
           <th>Version</th>
           <th>Estado</th>
           <th>Producto</th>
+          <th>Rendimiento</th>
           <th>Insumos</th>
           <th class="text-right">Acciones</th>
         </tr>
@@ -69,6 +71,7 @@ const resolveStatusLabel = (status: string) => status === 'active' ? 'Activa' : 
           <td>{{ recipe.version }}</td>
           <td>{{ resolveStatusLabel(recipe.status) }}</td>
           <td>{{ resolveProductName(recipe.productId) }}</td>
+          <td>{{ recipe.outputQuantity }} {{ resolveUnitLabel(recipe.outputUnitId) }}</td>
           <td>{{ recipe.items.length }}</td>
           <td class="text-right actions-cell">
             <v-btn size="small" variant="text" icon="mdi-pencil-outline" color="primary" @click.stop="emit('edit', recipe)" />
@@ -76,7 +79,7 @@ const resolveStatusLabel = (status: string) => status === 'active' ? 'Activa' : 
           </td>
         </tr>
         <tr v-if="filteredRecipes.length === 0">
-          <td colspan="7" class="empty-cell">No hay recetas registradas.</td>
+          <td colspan="8" class="empty-cell">No hay recetas registradas.</td>
         </tr>
       </tbody>
     </v-table>

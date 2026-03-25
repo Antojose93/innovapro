@@ -32,6 +32,16 @@ export const appRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/directorio',
+    name: 'directorio',
+    component: () => import('@/views/Directorio.vue'),
+    meta: {
+      title: 'Directorio',
+      icon: 'mdi-card-account-details-outline',
+      showInNavigation: true,
+    },
+  },
+  {
     path: '/inventario',
     name: 'inventario',
     component: () => import('@/views/Inventario.vue'),
@@ -44,7 +54,7 @@ export const appRoutes: RouteRecordRaw[] = [
   {
     path: '/produccion',
     name: 'produccion',
-    redirect: '/produccion/unidades',
+    redirect: '/produccion/ordenes',
     component: () => import('@/views/produccion/ProduccionView.vue'),
     meta: {
       title: 'Produccion',
@@ -53,32 +63,22 @@ export const appRoutes: RouteRecordRaw[] = [
     },
     children: [
       {
-        path: 'unidades',
-        name: 'produccion-unidades',
-        component: () => import('@/views/produccion/UnidadesView.vue'),
+        path: 'ordenes',
+        name: 'produccion-ordenes',
+        component: () => import('@/views/produccion/OrdenesView.vue'),
         meta: {
-          title: 'Unidades',
-          icon: 'mdi-ruler-square',
+          title: 'Ordenes',
+          icon: 'mdi-clipboard-text-outline',
           showInNavigation: false,
         },
       },
       {
-        path: 'recetas',
-        name: 'produccion-recetas',
-        component: () => import('@/views/produccion/RecetasView.vue'),
+        path: 'materiales',
+        name: 'produccion-materiales',
+        component: () => import('@/views/produccion/MaterialesView.vue'),
         meta: {
-          title: 'Recetas',
-          icon: 'mdi-notebook-edit-outline',
-          showInNavigation: false,
-        },
-      },
-      {
-        path: 'productos',
-        name: 'produccion-productos',
-        component: () => import('@/views/produccion/ProductosView.vue'),
-        meta: {
-          title: 'Productos',
-          icon: 'mdi-package-variant-closed',
+          title: 'Materiales',
+          icon: 'mdi-format-list-bulleted-square',
           showInNavigation: false,
         },
       },

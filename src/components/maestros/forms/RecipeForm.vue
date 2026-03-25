@@ -33,6 +33,8 @@ const form = reactive({
   productId: null as number | null,
   status: 'active',
   version: 'v1',
+  outputQuantity: 1,
+  outputUnitId: null as number | null,
   notes: '',
   items: [] as RecipeItem[],
 })
@@ -47,6 +49,8 @@ watch(
       form.productId = recipe.productId
       form.status = recipe.status
       form.version = recipe.version
+      form.outputQuantity = recipe.outputQuantity
+      form.outputUnitId = recipe.outputUnitId
       form.notes = recipe.notes ?? ''
       form.items = recipe.items.map((item) => ({
         materialId: item.materialId,
@@ -60,6 +64,8 @@ watch(
       form.productId = null
       form.status = 'active'
       form.version = 'v1'
+      form.outputQuantity = 1
+      form.outputUnitId = null
       form.notes = ''
       form.items = []
     }
@@ -69,7 +75,19 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => form.productId,
+  (productId) => {
+    if (form.outputUnitId) return
+    const product = products.value.find((entry) => entry.id === productId)
+    if (product) {
+      form.outputUnitId = product.unitId
+    }
+  }
+)
+
 const unitMap = computed(() => new Map(units.value.map((unit) => [unit.id, unit])))
+const outputUnitOptions = computed(() => units.value.map((unit) => ({ title: `${unit.name} (${unit.symbol})`, value: unit.id })))
 
 const inferUnitFamily = (unitId: number): string => {
   const unit = units.value.find((entry) => entry.id === unitId)
@@ -166,6 +184,8 @@ const validateForm = () => {
   if (!form.code.trim()) return 'Debes ingresar un codigo para la receta.'
   if (!form.name.trim()) return 'Debes ingresar un nombre para la receta.'
   if (!form.version.trim()) return 'Debes ingresar una version.'
+  if (!Number.isFinite(form.outputQuantity) || form.outputQuantity <= 0) return 'El rendimiento de la receta debe ser mayor que cero.'
+  if (!form.outputUnitId) return 'Selecciona la unidad de salida de la receta.'
   if (form.items.length === 0) return 'Agrega al menos un insumo.'
 
   const seenMaterials = new Set<number>()
@@ -190,6 +210,8 @@ const submit = async () => {
     productId: form.productId,
     status: form.status,
     version: form.version,
+    outputQuantity: Number(form.outputQuantity),
+    outputUnitId: Number(form.outputUnitId),
     notes: form.notes || null,
     items: form.items.map((item) => ({
       materialId: Number(item.materialId),
@@ -237,6 +259,29 @@ defineExpose({ submit })
         </v-col>
         <v-col cols="12" md="6">
           <v-select v-model="form.status" :items="statusOptions" label="Estado" variant="outlined" density="comfortable" />
+        </v-col>
+      </v-row>
+
+      <v-row dense>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model.number="form.outputQuantity"
+            label="Rendimiento de la receta"
+            type="number"
+            min="0.0001"
+            step="0.0001"
+            variant="outlined"
+            density="comfortable"
+          />
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+            v-model="form.outputUnitId"
+            :items="outputUnitOptions"
+            label="Unidad de salida"
+            variant="outlined"
+            density="comfortable"
+          />
         </v-col>
       </v-row>
 

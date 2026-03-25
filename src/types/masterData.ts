@@ -26,6 +26,7 @@ export interface Material {
   stockUnitId: number
   purchaseUnitId: number
   currentCost: number | null
+  currentCostUnitId: number | null
   lastCostAt: string | null
 }
 
@@ -62,6 +63,8 @@ export interface Recipe {
   productId: number | null
   status: string
   version: string
+  outputQuantity: number
+  outputUnitId: number
   notes: string | null
   items: RecipeItem[]
 }
@@ -146,6 +149,8 @@ export interface CreateRecipeInput {
   productId?: number | null
   status: string
   version: string
+  outputQuantity: number
+  outputUnitId: number
   notes?: string | null
   items: RecipeItem[]
 }
@@ -157,6 +162,8 @@ export interface UpdateRecipeInput {
   productId?: number | null
   status: string
   version: string
+  outputQuantity: number
+  outputUnitId: number
   notes?: string | null
   items: RecipeItem[]
 }

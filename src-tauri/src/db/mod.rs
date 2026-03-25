@@ -77,9 +77,12 @@ const SCHEMA_STATEMENTS: [&str; 13] = [
       product_id INTEGER,
       status TEXT NOT NULL DEFAULT 'active',
       version TEXT NOT NULL DEFAULT 'v1',
+      output_quantity REAL NOT NULL DEFAULT 1,
+      output_unit_id INTEGER NOT NULL DEFAULT 5,
       notes TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (product_id) REFERENCES finished_products(id) ON DELETE SET NULL
+      FOREIGN KEY (product_id) REFERENCES finished_products(id) ON DELETE SET NULL,
+      FOREIGN KEY (output_unit_id) REFERENCES units(id)
     )
     "#,
     r#"
@@ -284,6 +287,7 @@ pub async fn initialize(pool: &SqlitePool) -> AppResult<()> {
 
     ensure_finished_product_columns(pool).await?;
     ensure_recipe_item_columns(pool).await?;
+    ensure_recipe_output_columns(pool).await?;
     ensure_recipe_migration(pool).await?;
 
     Ok(())
@@ -463,12 +467,13 @@ async fn ensure_recipe_migration(pool: &SqlitePool) -> AppResult<()> {
 
         let recipe_result = sqlx::query(
             r#"
-            INSERT INTO recipes (code, name, product_id, status, version, notes)
-            VALUES (?, ?, ?, 'active', 'v1', 'Migrada automaticamente desde BOM historica')
+            INSERT INTO recipes (code, name, product_id, status, version, output_quantity, output_unit_id, notes)
+            VALUES (?, ?, ?, 'active', 'v1', 1, (SELECT unit_id FROM finished_products WHERE id = ?), 'Migrada automaticamente desde BOM historica')
             "#,
         )
         .bind(format!("REC-{}", product_code))
         .bind(format!("Receta {}", product_name))
+        .bind(product_id)
         .bind(product_id)
         .execute(&mut *transaction)
         .await?;
@@ -526,6 +531,51 @@ async fn ensure_recipe_item_columns(pool: &SqlitePool) -> AppResult<()> {
         )
         .execute(pool)
         .await?;
+    }
+
+    Ok(())
+}
+
+async fn ensure_recipe_output_columns(pool: &SqlitePool) -> AppResult<()> {
+    let columns = sqlx::query("PRAGMA table_info(recipes)")
+        .fetch_all(pool)
+        .await?;
+
+    let has_output_quantity = columns
+        .iter()
+        .any(|row| row.get::<String, _>("name") == "output_quantity");
+    let has_output_unit_id = columns
+        .iter()
+        .any(|row| row.get::<String, _>("name") == "output_unit_id");
+
+    if !has_output_quantity {
+        sqlx::query("ALTER TABLE recipes ADD COLUMN output_quantity REAL NOT NULL DEFAULT 1")
+            .execute(pool)
+            .await?;
+    }
+
+    if !has_output_unit_id {
+        sqlx::query("ALTER TABLE recipes ADD COLUMN output_unit_id INTEGER REFERENCES units(id)")
+            .execute(pool)
+            .await?;
+
+        sqlx::query(
+            r#"
+            UPDATE recipes
+            SET output_unit_id = (
+              SELECT finished_products.unit_id
+              FROM finished_products
+              WHERE finished_products.id = recipes.product_id
+            )
+            WHERE output_unit_id IS NULL AND product_id IS NOT NULL
+            "#,
+        )
+        .execute(pool)
+        .await?;
+
+        sqlx::query("UPDATE recipes SET output_unit_id = 5 WHERE output_unit_id IS NULL")
+            .execute(pool)
+            .await?;
     }
 
     Ok(())
