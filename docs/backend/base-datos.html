@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base de Datos Backend | ERP Produccion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <div class="mx-auto max-w-7xl px-6 py-10 lg:px-10">
+      <nav class="mb-8 flex flex-wrap gap-3 text-sm">
+        <a href="./index.html" class="rounded-full bg-slate-900 px-4 py-2 text-white">Inicio</a>
+        <a href="./arquitectura.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Arquitectura</a>
+        <a href="./capas.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Capas</a>
+      </nav>
+
+      <header class="rounded-3xl bg-slate-900 px-8 py-10 text-white shadow-xl">
+        <p class="text-sm uppercase tracking-[0.25em] text-amber-300">Base de datos</p>
+        <h1 class="mt-3 text-4xl font-black tracking-tight">Modelo entidad relacion en SQLite</h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+          El esquema se define en <span class="font-semibold text-white">src-tauri/src/db/mod.rs</span>.
+          Se crean tablas base, indices, datos semilla y ajustes de compatibilidad al iniciar la aplicacion.
+        </p>
+      </header>
+
+      <section class="mt-8 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-2xl font-bold">Vista relacional</h2>
+        <div class="mt-6 grid gap-4 lg:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">units</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Catalogo de unidades de medida.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>UQ:</strong> code</li><li>name, symbol, created_at</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">materials</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Materias primas con dos referencias a unidades.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>UQ:</strong> code</li><li><strong>FK:</strong> stock_unit_id -> units.id</li><li><strong>FK:</strong> purchase_unit_id -> units.id</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">material_cost_history</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Historico de costos por material y unidad.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>FK:</strong> material_id -> materials.id</li><li><strong>FK:</strong> unit_id -> units.id</li><li>unit_cost, effective_at</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">finished_products</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Productos terminados fabricados por la empresa.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>UQ:</strong> code</li><li><strong>FK:</strong> unit_id -> units.id</li><li><strong>FK:</strong> recipe_id -> recipes.id</li><li>category, status, internal_code, commercial_code</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">recipes</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Definen formulacion o composicion de un producto.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>UQ:</strong> code</li><li><strong>FK:</strong> product_id -> finished_products.id</li><li>status, version, notes</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">recipe_items</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Detalle de materias primas por receta.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>FK:</strong> recipe_id -> recipes.id</li><li><strong>FK:</strong> material_id -> materials.id</li><li><strong>FK:</strong> unit_id -> units.id</li><li><strong>UQ:</strong> recipe_id + material_id</li></ul>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-4 lg:grid-cols-2">
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">unit_conversions</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Factores de conversion entre unidades.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>FK:</strong> from_unit_id -> units.id</li><li><strong>FK:</strong> to_unit_id -> units.id</li><li><strong>UQ:</strong> from_unit_id + to_unit_id</li></ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h3 class="text-lg font-bold">product_bom_items</h3>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Tabla historica de BOM usada para migrar productos antiguos hacia recetas.</p>
+            <ul class="mt-4 space-y-2 text-sm text-slate-700"><li><strong>PK:</strong> id</li><li><strong>FK:</strong> product_id -> finished_products.id</li><li><strong>FK:</strong> material_id -> materials.id</li><li><strong>UQ:</strong> product_id + material_id</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 rounded-3xl bg-slate-900 p-8 text-white shadow-xl">
+        <h2 class="text-2xl font-bold">Diagrama ER resumido</h2>
+        <div class="mt-6 overflow-x-auto rounded-2xl bg-slate-950 p-6">
+          <pre class="text-sm leading-7 text-slate-300"><code>units
+ ├─&lt; materials.stock_unit_id
+ ├─&lt; materials.purchase_unit_id
+ ├─&lt; material_cost_history.unit_id
+ ├─&lt; finished_products.unit_id
+ ├─&lt; recipe_items.unit_id
+ ├─&lt; unit_conversions.from_unit_id
+ └─&lt; unit_conversions.to_unit_id
+
+materials
+ ├─&lt; material_cost_history.material_id
+ ├─&lt; recipe_items.material_id
+ └─&lt; product_bom_items.material_id
+
+finished_products
+ ├─&lt; product_bom_items.product_id
+ ├─ recipes.product_id
+ └─ recipe_id &gt;─ recipes.id
+
+recipes
+ └─&lt; recipe_items.recipe_id</code></pre>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Seeds y datos iniciales</h2>
+          <ul class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4">Se insertan unidades base como <strong>KG</strong>, <strong>G</strong>, <strong>L</strong>, <strong>ML</strong> y <strong>UND</strong>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Se agregan unidades especializadas como <strong>GAL</strong>, <strong>VAR6</strong>, <strong>PLA6</strong>, <strong>TUB6</strong> y <strong>CAJ5</strong>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Se siembran materias primas y su costo inicial en <strong>material_cost_history</strong>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Se registran conversiones predefinidas como <strong>KG -> G</strong>, <strong>GAL -> L</strong> y equivalencias de piezas de 6 metros.</li>
+          </ul>
+        </article>
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Migraciones embebidas</h2>
+          <ul class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4">Si faltan columnas en <strong>finished_products</strong>, se agregan <strong>category</strong>, <strong>status</strong>, <strong>recipe_id</strong>, <strong>internal_code</strong> y <strong>commercial_code</strong>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Si <strong>recipe_items</strong> no tiene <strong>unit_id</strong>, la columna se crea y se rellena con la unidad de stock del material.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Si un producto antiguo tiene BOM historica y no tiene receta asociada, se migra a <strong>recipes</strong> y <strong>recipe_items</strong> automaticamente.</li>
+          </ul>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

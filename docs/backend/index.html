@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentacion Backend | ERP Produccion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              night: '#08111f',
+              steel: '#1e293b',
+              mist: '#cbd5e1',
+              brand: '#0f766e',
+              accent: '#f59e0b',
+              signal: '#38bdf8',
+            },
+          },
+        },
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(56,189,248,0.14),_transparent_28%)]"></div>
+    <div class="relative mx-auto max-w-7xl px-6 py-10 lg:px-10">
+      <header class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div class="flex flex-wrap gap-3 text-sm">
+          <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-emerald-200">Backend</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Rust</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Tauri</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">SQLite</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">SQLx</span>
+        </div>
+        <div class="mt-8 grid gap-8 lg:grid-cols-[1.7fr_1fr]">
+          <div>
+            <p class="text-sm uppercase tracking-[0.28em] text-emerald-300">ERP Produccion</p>
+            <h1 class="mt-3 text-4xl font-black tracking-tight text-white lg:text-6xl">Documentacion del backend</h1>
+            <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
+              Esta documentacion describe la estructura real de <span class="font-semibold text-white">src-tauri</span>,
+              el flujo de capas del backend y el modelo entidad relacion de la base de datos SQLite que usa la aplicacion.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Resumen rapido</p>
+            <dl class="mt-4 space-y-4 text-sm text-slate-300">
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3"><dt>Entrada</dt><dd class="text-right text-white">src-tauri/src/main.rs</dd></div>
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3"><dt>Bootstrap</dt><dd class="text-right text-white">src-tauri/src/app/mod.rs</dd></div>
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3"><dt>Persistencia</dt><dd class="text-right text-white">src-tauri/src/db/mod.rs</dd></div>
+              <div class="flex items-start justify-between gap-4"><dt>Estado compartido</dt><dd class="text-right text-white">AppState + SqlitePool</dd></div>
+            </dl>
+          </div>
+        </div>
+      </header>
+
+      <main class="mt-8 grid gap-6 lg:grid-cols-3">
+        <a href="./arquitectura.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-emerald-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-emerald-300">01</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Arquitectura</h2>
+          <p class="mt-3 leading-7 text-slate-300">Explica como se organiza el backend en modulos, que responsabilidad tiene cada carpeta y como viaja una solicitud desde el frontend hasta SQLite.</p>
+        </a>
+        <a href="./capas.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">02</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Capas y flujo</h2>
+          <p class="mt-3 leading-7 text-slate-300">Detalla la relacion entre commands, services, repositories, domain y state, con el flujo de validacion, reglas y acceso a datos.</p>
+        </a>
+        <a href="./base-datos.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-amber-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-amber-300">03</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Modelo ER</h2>
+          <p class="mt-3 leading-7 text-slate-300">Resume tablas, claves, relaciones e inicializacion automatica de la base de datos del catalogo maestro de produccion.</p>
+        </a>
+      </main>
+
+      <section class="mt-10 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8">
+          <h2 class="text-2xl font-bold text-white">Mapa general del backend</h2>
+          <div class="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+            <pre class="text-sm leading-7 text-slate-300"><code>src-tauri/
+├─ src/
+│  ├─ main.rs
+│  ├─ lib.rs
+│  ├─ app/
+│  ├─ commands/
+│  ├─ services/
+│  ├─ repositories/
+│  ├─ domain/
+│  ├─ db/
+│  ├─ state/
+│  └─ errors.rs
+├─ Cargo.toml
+└─ tauri.conf.json</code></pre>
+          </div>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-8">
+          <h2 class="text-2xl font-bold text-white">Aclaracion sobre "arquitecturas"</h2>
+          <p class="mt-4 leading-7 text-slate-300">
+            En el codigo actual no existe una carpeta llamada <span class="font-semibold text-white">arquitecturas</span>.
+            La arquitectura del backend esta distribuida por modulos dentro de <span class="font-semibold text-white">src-tauri/src</span>.
+          </p>
+          <ul class="mt-5 space-y-4 text-slate-300">
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">La capa de entrada esta en <span class="font-semibold text-white">main.rs</span>, <span class="font-semibold text-white">lib.rs</span> y <span class="font-semibold text-white">app/</span>.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">La logica de negocio vive principalmente en <span class="font-semibold text-white">services/</span>.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">La persistencia y migraciones estan en <span class="font-semibold text-white">repositories/</span> y <span class="font-semibold text-white">db/</span>.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

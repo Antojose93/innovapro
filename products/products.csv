@@ -1,0 +1,16 @@
+﻿Categoria,Producto,Unidad de Medida,Precio Estimado MÃ­nimo (COP),Precio Estimado maximo (COP),Notas
+Hierro,Varilla Corrugada 3/8" (9.5mm),Unidad (6 metros),17000,20000,Refuerzo estructural basico
+Hierro,Varilla Corrugada 1/2" (12.7mm),Unidad (6 metros),30000,35000,Refuerzo o bases estructurales
+Hierro,Varilla Cuadrada Lisa 1/2" (12mm),Unidad (6 metros),35000,42000,Ideal para rejas y forja
+Hierro,Platina de Hierro 1" x 1/8",Unidad (6 metros),22000,26000,Marcos y soportes
+Hierro,Platina de Hierro 2" x 1/8",Unidad (6 metros),45000,52000,Refuerzos y bases anchas
+Hierro,Tubo Cuadrado (Perfil) 1.5" x 1.5" (Calibre 18),Unidad (6 metros),48000,55000,Para marcos de puertas y ventanas
+Soldadura,Electrodo E6013 de 1/8",Caja de 5 kg,90000,135000,Marcas comunes: Westarco o Lincoln
+Soldadura,Electrodo E6013 de 1/8",Kilo suelto,22000,26000,Para compras o arreglos menores
+Soldadura,Electrodo E7018 de 1/8" (Alta resistencia),Caja de 5 kg,110000,150000,Para soldadura estructural pesada
+Pinturas y Solventes,Thinner Corriente / acrilico,GalÃ³n,27000,37000,Para limpieza de piezas y dilucion de pinturas
+Pinturas y Solventes,Pintura Anticorrosiva (Gris/Rojo),GalÃ³n,50000,65000,proteccion base contra el oxido y el salitre
+Pinturas y Solventes,Laca / Esmalte sintetico (Colores),GalÃ³n,110000,130000,Acabado final para exteriores
+Consumibles,Disco de Corte para Metal 4.5",Unidad,4000,7000,Marcas estÃ¡ndar (Norton, Dewalt, etc.)
+Consumibles,Disco de Desbaste / Pulir 4.5",Unidad,6000,9000,Para pulir los cordones de soldadura
+Consumibles,Bisagra de CÃ¡psula o Torneada 5/8",Unidad,3000,5000,Ideal para portones pesados

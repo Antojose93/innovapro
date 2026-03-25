@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flujo de Datos Frontend | ERP Producción</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-white text-slate-900">
+    <div class="mx-auto max-w-6xl px-6 py-10 lg:px-10">
+      <nav class="mb-8 flex flex-wrap gap-3 text-sm">
+        <a href="./index.html" class="rounded-full bg-slate-900 px-4 py-2 text-white">Inicio</a>
+        <a href="./arquitectura.html" class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Arquitectura</a>
+        <a href="./modulos.html" class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Módulos</a>
+      </nav>
+
+      <header class="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-900 px-8 py-10 text-white shadow-xl">
+        <p class="text-sm uppercase tracking-[0.25em] text-cyan-300">Estado y servicios</p>
+        <h1 class="mt-3 text-4xl font-black tracking-tight">Flujo de datos del frontend</h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+          La aplicación distribuye responsabilidades entre stores de Pinia, tipos TypeScript y un servicio
+          de escritorio que abstrae la comunicación con Tauri o un fallback mock cuando corre como web.
+        </p>
+      </header>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl border border-slate-200 p-8 shadow-sm">
+          <h2 class="text-2xl font-bold">Stores de Pinia</h2>
+          <div class="mt-5 space-y-4">
+            <div class="rounded-2xl bg-slate-50 p-5">
+              <h3 class="text-lg font-semibold">`useAppStore`</h3>
+              <p class="mt-2 leading-7 text-slate-700">
+                Store pequeño enfocado en UI global. Solo administra `isSidebarOpen` y la acción
+                `toggleSidebar()` para el menú lateral.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-5">
+              <h3 class="text-lg font-semibold">`useMasterDataStore`</h3>
+              <p class="mt-2 leading-7 text-slate-700">
+                Store principal del frontend. Mantiene `units`, `materials`, `products`, `recipes`,
+                `conversions`, `costHistory`, estados `loading` y `saving`, mensajes de éxito/error
+                y el resultado de conversiones.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-200 p-8 shadow-sm">
+          <h2 class="text-2xl font-bold">Patrón operativo</h2>
+          <ul class="mt-5 space-y-3 leading-7 text-slate-700">
+            <li>`hydrate()` consulta el snapshot completo y refresca historial de costos si aplica.</li>
+            <li>`withTask()` centraliza control de `loading`, `saving` y captura uniforme de errores.</li>
+            <li>Cada acción CRUD delega en `desktopService` y luego reaplica el snapshot recibido.</li>
+            <li>La vista `Maestros` consume ese store y lo combina con tabs, catálogos y formularios.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-8 rounded-3xl border border-slate-200 p-8 shadow-sm">
+        <h2 class="text-2xl font-bold">Servicio de integración: `desktopService`</h2>
+        <div class="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p class="leading-7 text-slate-700">
+              `src/services/desktop.ts` concentra la integración del frontend con Tauri. El servicio usa
+              `invoke()` de `@tauri-apps/api/core` y expone métodos para salud del sistema, tabs de
+              producción, snapshot maestro, historial de costos, CRUD de unidades/materiales/productos/
+              recetas/conversiones y cálculo de conversiones.
+            </p>
+            <div class="mt-6 overflow-x-auto rounded-2xl bg-slate-950 p-5">
+              <pre class="text-sm leading-7 text-slate-300"><code>UI Vue
+  -> Pinia store
+    -> desktopService
+      -> isTauriApp()
+        -> invoke(...) si corre en Tauri
+        -> fallback mock si corre como web</code></pre>
+            </div>
+          </div>
+          <div class="rounded-2xl bg-slate-50 p-6">
+            <h3 class="text-lg font-semibold">Detección de entorno</h3>
+            <p class="mt-3 leading-7 text-slate-700">
+              `src/lib/tauri.ts` considera que la app está dentro de Tauri si existe
+              `__TAURI_INTERNALS__` en `window`. Si no existe, el frontend trabaja con datos mock locales.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl border border-slate-200 p-8 shadow-sm">
+          <h2 class="text-2xl font-bold">Tipos de dominio usados en el frontend</h2>
+          <div class="mt-5 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
+            <div class="rounded-2xl bg-slate-50 p-4">SystemHealth</div>
+            <div class="rounded-2xl bg-slate-50 p-4">ProductionTab</div>
+            <div class="rounded-2xl bg-slate-50 p-4">Unit</div>
+            <div class="rounded-2xl bg-slate-50 p-4">Material</div>
+            <div class="rounded-2xl bg-slate-50 p-4">MaterialCostHistoryEntry</div>
+            <div class="rounded-2xl bg-slate-50 p-4">FinishedProduct</div>
+            <div class="rounded-2xl bg-slate-50 p-4">Recipe y RecipeItem</div>
+            <div class="rounded-2xl bg-slate-50 p-4">UnitConversion</div>
+            <div class="rounded-2xl bg-slate-50 p-4">MasterDataSnapshot</div>
+            <div class="rounded-2xl bg-slate-50 p-4">Inputs de creación, actualización y conversión</div>
+          </div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-200 p-8 shadow-sm">
+          <h2 class="text-2xl font-bold">Fallback mock</h2>
+          <p class="mt-4 leading-7 text-slate-700">
+            El frontend puede funcionar sin backend activo. `desktopService` incluye un `desktopFallback`
+            con catálogo inicial de unidades, materias primas, productos, recetas, conversiones e historial
+            de costos. Esto permite desarrollar la interfaz y validar flujos sin depender de Tauri.
+          </p>
+          <p class="mt-4 leading-7 text-slate-700">
+            También resuelve conversiones entre unidades por recorrido de grafo, no solo por coincidencias
+            directas, lo que amplía la capacidad del mock para pruebas de la UI.
+          </p>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

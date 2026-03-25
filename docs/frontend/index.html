@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentación Frontend | ERP Producción</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: '#0f172a',
+              mist: '#e2e8f0',
+              cloud: '#f8fafc',
+              brand: '#5568a5',
+              accent: '#38BDF8',
+              pine: '#10B981',
+            },
+          },
+        },
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(85,104,165,0.28),_transparent_30%)]"></div>
+    <div class="relative mx-auto max-w-7xl px-6 py-10 lg:px-10">
+      <header class="mb-10 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <span class="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-cyan-200">Frontend</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Vue 3</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Pinia</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Vue Router</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Vuetify</span>
+          <span class="rounded-full border border-white/10 px-3 py-1 text-slate-300">Tauri</span>
+        </div>
+        <div class="grid gap-8 lg:grid-cols-[1.7fr_1fr]">
+          <div>
+            <p class="mb-3 text-sm uppercase tracking-[0.28em] text-cyan-300">ERP Producción</p>
+            <h1 class="max-w-3xl text-4xl font-black tracking-tight text-white lg:text-6xl">
+              Documentación del frontend de la aplicación
+            </h1>
+            <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+              Esta documentación describe exclusivamente la capa visual y de estado del proyecto:
+              estructura, rutas, vistas, stores, integración con Tauri y módulos funcionales visibles
+              desde la interfaz.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Resumen rápido</p>
+            <dl class="mt-4 space-y-4 text-sm text-slate-300">
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3">
+                <dt>Entrada principal</dt>
+                <dd class="text-right text-white">`src/main.ts`</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3">
+                <dt>Layout raíz</dt>
+                <dd class="text-right text-white">`src/layouts/MainLayout.vue`</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3">
+                <dt>Navegación</dt>
+                <dd class="text-right text-white">Vue Router</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 border-b border-white/5 pb-3">
+                <dt>Estado</dt>
+                <dd class="text-right text-white">Pinia</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt>UI base</dt>
+                <dd class="text-right text-white">Vuetify 4</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </header>
+
+      <main class="grid gap-6 lg:grid-cols-3">
+        <a href="./arquitectura.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">01</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Arquitectura</h2>
+          <p class="mt-3 leading-7 text-slate-300">
+            Describe el arranque de la app, layout principal, enrutamiento, tema visual y organización
+            de carpetas del frontend.
+          </p>
+          <span class="mt-6 inline-flex text-sm font-semibold text-cyan-200 group-hover:text-cyan-100">Abrir página</span>
+        </a>
+
+        <a href="./modulos.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">02</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Módulos y pantallas</h2>
+          <p class="mt-3 leading-7 text-slate-300">
+            Recorre Dashboard, Maestros, Inventario, Producción y Finanzas con foco en la funcionalidad
+            observable desde la UI.
+          </p>
+          <span class="mt-6 inline-flex text-sm font-semibold text-cyan-200 group-hover:text-cyan-100">Abrir página</span>
+        </a>
+
+        <a href="./datos.html" class="group rounded-3xl border border-white/10 bg-white/5 p-7 transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/10">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">03</p>
+          <h2 class="mt-4 text-2xl font-bold text-white">Flujo de datos</h2>
+          <p class="mt-3 leading-7 text-slate-300">
+            Explica stores, tipos TypeScript, servicios, comandos invocados desde Tauri y el fallback
+            mock del frontend.
+          </p>
+          <span class="mt-6 inline-flex text-sm font-semibold text-cyan-200 group-hover:text-cyan-100">Abrir página</span>
+        </a>
+      </main>
+
+      <section class="mt-10 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8">
+          <h2 class="text-2xl font-bold text-white">Mapa general del frontend</h2>
+          <div class="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+            <pre class="text-sm leading-7 text-slate-300"><code>src/
+├─ App.vue
+├─ main.ts
+├─ style.css
+├─ layouts/
+│  └─ MainLayout.vue
+├─ router/
+│  ├─ index.ts
+│  └─ routes.ts
+├─ plugins/
+│  └─ vuetify.ts
+├─ views/
+│  ├─ Dashboard.vue
+│  ├─ Maestros.vue
+│  ├─ Inventario.vue
+│  ├─ Finanzas.vue
+│  └─ produccion/
+├─ stores/
+│  ├─ app.ts
+│  └─ masterData.ts
+├─ services/
+│  └─ desktop.ts
+├─ lib/
+│  └─ tauri.ts
+└─ components/maestros/
+   ├─ catálogos CRUD
+   └─ formularios</code></pre>
+          </div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-8">
+          <h2 class="text-2xl font-bold text-white">Objetivo de esta carpeta</h2>
+          <ul class="mt-5 space-y-4 text-slate-300">
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">Centralizar la documentación funcional del frontend en archivos HTML fáciles de abrir localmente.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">Servir como base para onboarding técnico, revisión de pantallas y futuras ampliaciones de la UI.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-900/60 p-4">Separar claramente lo documentado del frontend respecto al backend en Rust/Tauri.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

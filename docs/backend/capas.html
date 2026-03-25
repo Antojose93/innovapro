@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capas Backend | ERP Produccion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="mx-auto max-w-7xl px-6 py-10 lg:px-10">
+      <nav class="mb-8 flex flex-wrap gap-3 text-sm">
+        <a href="./index.html" class="rounded-full bg-white/10 px-4 py-2 text-white">Inicio</a>
+        <a href="./arquitectura.html" class="rounded-full bg-white/10 px-4 py-2 text-white">Arquitectura</a>
+        <a href="./base-datos.html" class="rounded-full bg-white/10 px-4 py-2 text-white">Base de datos</a>
+      </nav>
+
+      <header class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <p class="text-sm uppercase tracking-[0.25em] text-cyan-300">Capas y flujo</p>
+        <h1 class="mt-3 text-4xl font-black tracking-tight text-white">Como se conectan los modulos del backend</h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+          La carpeta <span class="font-semibold text-white">src-tauri/src</span> esta organizada para que la UI
+          invoque comandos simples, mientras la validacion y el acceso a datos quedan encapsulados en capas internas.
+        </p>
+      </header>
+
+      <section class="mt-8 grid gap-6 xl:grid-cols-5">
+        <div class="rounded-3xl border border-cyan-400/20 bg-cyan-400/10 p-6 xl:col-span-1">
+          <p class="text-sm uppercase tracking-[0.2em] text-cyan-200">1. Commands</p>
+          <h2 class="mt-3 text-xl font-bold text-white">Entrada Tauri</h2>
+          <p class="mt-3 leading-7 text-slate-200">Reciben parametros serializados desde el frontend y delegan en servicios. No concentran reglas de negocio.</p>
+        </div>
+        <div class="rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-6 xl:col-span-1">
+          <p class="text-sm uppercase tracking-[0.2em] text-emerald-200">2. Services</p>
+          <h2 class="mt-3 text-xl font-bold text-white">Reglas y validacion</h2>
+          <p class="mt-3 leading-7 text-slate-200">Normalizan texto, validan referencias, aplican restricciones y coordinan operaciones compuestas.</p>
+        </div>
+        <div class="rounded-3xl border border-amber-400/20 bg-amber-400/10 p-6 xl:col-span-1">
+          <p class="text-sm uppercase tracking-[0.2em] text-amber-200">3. Repositories</p>
+          <h2 class="mt-3 text-xl font-bold text-white">SQL explicito</h2>
+          <p class="mt-3 leading-7 text-slate-200">Ejecutan SELECT, INSERT, UPDATE y DELETE sobre SQLite mediante SQLx y devuelven structs del dominio.</p>
+        </div>
+        <div class="rounded-3xl border border-fuchsia-400/20 bg-fuchsia-400/10 p-6 xl:col-span-1">
+          <p class="text-sm uppercase tracking-[0.2em] text-fuchsia-200">4. Domain</p>
+          <h2 class="mt-3 text-xl font-bold text-white">Contratos</h2>
+          <p class="mt-3 leading-7 text-slate-200">Define modelos serializables de entrada y salida como <span class="font-semibold">CreateUnitInput</span>, <span class="font-semibold">Recipe</span> o <span class="font-semibold">MasterDataSnapshot</span>.</p>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-6 xl:col-span-1">
+          <p class="text-sm uppercase tracking-[0.2em] text-slate-300">5. State + DB</p>
+          <h2 class="mt-3 text-xl font-bold text-white">Infraestructura</h2>
+          <p class="mt-3 leading-7 text-slate-200"><span class="font-semibold">AppState</span> comparte el pool, y <span class="font-semibold">db/mod.rs</span> asegura esquema, indices, seeds y migraciones al iniciar.</p>
+        </div>
+      </section>
+
+      <section class="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8">
+        <h2 class="text-2xl font-bold text-white">Ejemplo: creacion de una materia prima</h2>
+        <div class="mt-6 grid gap-4 lg:grid-cols-4">
+          <div class="rounded-2xl bg-slate-900/80 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">Command</p>
+            <p class="mt-3 text-sm leading-6 text-slate-300"><span class="font-semibold text-white">create_material</span> recibe el payload desde Tauri.</p>
+          </div>
+          <div class="rounded-2xl bg-slate-900/80 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-emerald-300">Service</p>
+            <p class="mt-3 text-sm leading-6 text-slate-300">Limpia codigo y nombre, valida unidades, costo inicial y existencia de referencias.</p>
+          </div>
+          <div class="rounded-2xl bg-slate-900/80 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-amber-300">Repository</p>
+            <p class="mt-3 text-sm leading-6 text-slate-300">Inserta en <span class="font-semibold text-white">materials</span> y opcionalmente crea el primer registro en <span class="font-semibold text-white">material_cost_history</span>.</p>
+          </div>
+          <div class="rounded-2xl bg-slate-900/80 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-fuchsia-300">Respuesta</p>
+            <p class="mt-3 text-sm leading-6 text-slate-300">Devuelve un <span class="font-semibold text-white">MasterDataSnapshot</span> actualizado para refrescar la UI.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-8">
+          <h2 class="text-2xl font-bold text-white">Patrones observados</h2>
+          <ul class="mt-5 space-y-4 text-slate-300">
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">Los servicios retornan snapshots completos despues de operaciones CRUD para simplificar sincronizacion del frontend.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">Las validaciones de negocio se ejecutan antes de tocar la base de datos.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">Los errores se exponen como texto serializable mediante <span class="font-semibold text-white">AppError</span>.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">Las operaciones complejas usan transacciones, por ejemplo al crear materiales con costo inicial o migrar recetas desde BOM historico.</li>
+          </ul>
+        </article>
+        <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-8">
+          <h2 class="text-2xl font-bold text-white">Puntos de atencion</h2>
+          <ul class="mt-5 space-y-4 text-slate-300">
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">El dominio <span class="font-semibold text-white">FinishedProduct</span> incluye campos agregados por migracion que no estaban en la definicion inicial de la tabla.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">La base se autoevoluciona en tiempo de arranque con <span class="font-semibold text-white">ALTER TABLE</span> y verificaciones de columnas existentes.</li>
+            <li class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">Existe compatibilidad retroactiva con datos antiguos gracias a la migracion de <span class="font-semibold text-white">product_bom_items</span> hacia <span class="font-semibold text-white">recipes</span> y <span class="font-semibold text-white">recipe_items</span>.</li>
+          </ul>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

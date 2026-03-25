@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arquitectura Backend | ERP Produccion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#0f766e',
+              accent: '#38bdf8',
+            },
+          },
+        },
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <div class="mx-auto max-w-7xl px-6 py-10 lg:px-10">
+      <nav class="mb-8 flex flex-wrap gap-3 text-sm">
+        <a href="./index.html" class="rounded-full bg-slate-900 px-4 py-2 text-white">Inicio</a>
+        <a href="./capas.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Capas</a>
+        <a href="./base-datos.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Base de datos</a>
+      </nav>
+
+      <header class="rounded-3xl bg-slate-900 px-8 py-10 text-white shadow-xl">
+        <p class="text-sm uppercase tracking-[0.25em] text-emerald-300">Arquitectura</p>
+        <h1 class="mt-3 text-4xl font-black tracking-tight">Estructura del backend en src-tauri</h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+          El backend esta construido con Rust sobre Tauri. Su diseno sigue una separacion por capas:
+          comandos Tauri para entrada, servicios para reglas, repositorios para SQL, dominio para
+          contratos de datos y un estado compartido para la conexion a la base de datos.
+        </p>
+      </header>
+
+      <section class="mt-8 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-2xl font-bold">Arbol funcional</h2>
+        <div class="mt-6 overflow-x-auto rounded-2xl bg-slate-950 p-5">
+          <pre class="text-sm leading-7 text-slate-300"><code>src-tauri/src
+├─ main.rs                -> punto de entrada ejecutable
+├─ lib.rs                 -> registra modulos y expone run()
+├─ app/mod.rs             -> construye Tauri Builder y registra commands
+├─ state/mod.rs           -> AppState con metadata y SqlitePool
+├─ errors.rs              -> AppError y AppResult
+├─ commands/              -> interfaz invocable desde el frontend
+├─ services/              -> validaciones y logica de negocio
+├─ repositories/          -> consultas SQL y escrituras a SQLite
+├─ domain/                -> structs de entrada y salida
+└─ db/mod.rs              -> esquema, indices, seeds y migraciones ligeras</code></pre>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Secuencia de arranque</h2>
+          <ol class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>1. main.rs</strong><br />Ejecuta <span class="font-semibold">erp_produccion_lib::run()</span>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>2. lib.rs</strong><br />Declara modulos y llama a <span class="font-semibold">app::build()</span>.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>3. app/mod.rs</strong><br />Construye el runtime Tauri, crea <span class="font-semibold">AppState</span>, lo registra con <span class="font-semibold">app.manage(...)</span> y expone todos los commands.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>4. state/mod.rs</strong><br />Resuelve el directorio de datos local, crea o abre <span class="font-semibold">erp_produccion.sqlite</span>, inicializa el pool y ejecuta <span class="font-semibold">db::initialize()</span>.</li>
+          </ol>
+        </article>
+
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Responsabilidad por carpeta</h2>
+          <ul class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>app/</strong>: configuracion central de Tauri y registro de endpoints.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>commands/</strong>: adaptadores del protocolo Tauri; reciben parametros y delegan.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>services/</strong>: capa de negocio, validacion y orquestacion.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>repositories/</strong>: lectura y escritura SQL usando SQLx.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>domain/</strong>: DTOs, payloads y snapshots serializables.</li>
+            <li class="rounded-2xl bg-slate-50 p-4"><strong>db/</strong>: esquema, indices, datos semilla y migraciones evolutivas.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="mt-8 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-2xl font-bold">Modulos funcionales actuales</h2>
+        <div class="mt-6 grid gap-6 md:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-slate-500">System</p>
+            <p class="mt-2 text-lg font-semibold">Estado tecnico</p>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Expone <span class="font-semibold">health_check</span> con nombre de app, version, ambiente y estado general.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Production</p>
+            <p class="mt-2 text-lg font-semibold">Tabs de produccion</p>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Devuelve configuracion de pestanas visibles para el modulo de produccion.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 p-5">
+            <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Master Data</p>
+            <p class="mt-2 text-lg font-semibold">Catalogos de negocio</p>
+            <p class="mt-3 text-sm leading-6 text-slate-600">Gestiona unidades, materias primas, costos, recetas, productos terminados y conversiones.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Flujo general de una operacion</h2>
+          <div class="mt-6 rounded-2xl bg-slate-950 p-6 text-sm leading-7 text-slate-300">
+            Frontend Vue<br />
+            ↓ invoke()<br />
+            commands::master_data::*<br />
+            ↓<br />
+            MasterDataService<br />
+            ↓ validaciones / normalizacion / reglas<br />
+            MasterDataRepository<br />
+            ↓ SQLx + SQLite<br />
+            AppResult&lt;T&gt; serializable hacia Tauri
+          </div>
+        </article>
+
+        <article class="rounded-3xl bg-slate-900 p-8 text-white shadow-xl">
+          <h2 class="text-2xl font-bold">Decision arquitectonica relevante</h2>
+          <p class="mt-4 leading-7 text-slate-300">
+            El backend no usa un ORM de alto nivel ni migraciones externas. El esquema se controla con
+            SQL directo dentro de <span class="font-semibold text-white">db/mod.rs</span>. Eso simplifica
+            despliegue y hace visible la evolucion real de tablas y seeds desde el propio codigo fuente.
+          </p>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

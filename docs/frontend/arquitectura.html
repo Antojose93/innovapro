@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arquitectura Frontend | ERP Producción</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#5568a5',
+              accent: '#38BDF8',
+            },
+          },
+        },
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <div class="mx-auto max-w-6xl px-6 py-10 lg:px-10">
+      <nav class="mb-8 flex flex-wrap gap-3 text-sm">
+        <a href="./index.html" class="rounded-full bg-slate-900 px-4 py-2 text-white">Inicio</a>
+        <a href="./modulos.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Módulos</a>
+        <a href="./datos.html" class="rounded-full bg-white px-4 py-2 text-slate-700 shadow-sm">Flujo de datos</a>
+      </nav>
+
+      <header class="rounded-3xl bg-slate-900 px-8 py-10 text-white shadow-xl">
+        <p class="text-sm uppercase tracking-[0.25em] text-cyan-300">Arquitectura</p>
+        <h1 class="mt-3 text-4xl font-black tracking-tight">Cómo está compuesto el frontend</h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+          El frontend es una aplicación Vue 3 con TypeScript que usa Vuetify para la capa visual,
+          Vue Router para navegación y Pinia para estado global. Corre como aplicación web y también
+          como cliente de escritorio sobre Tauri.
+        </p>
+      </header>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Flujo de arranque</h2>
+          <ol class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4">
+              <strong>1. `src/main.ts`</strong><br />
+              Crea la aplicación Vue, instancia Pinia, registra router y Vuetify, y monta `App.vue`.
+            </li>
+            <li class="rounded-2xl bg-slate-50 p-4">
+              <strong>2. `src/App.vue`</strong><br />
+              Actúa como contenedor mínimo y delega toda la estructura visual al `MainLayout`.
+            </li>
+            <li class="rounded-2xl bg-slate-50 p-4">
+              <strong>3. `src/layouts/MainLayout.vue`</strong><br />
+              Renderiza `v-app`, barra superior, drawer lateral, contenedor principal y `router-view`
+              con una transición de desvanecimiento.
+            </li>
+          </ol>
+        </article>
+
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Tecnologías visibles</h2>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Framework</p>
+              <p class="mt-2 text-lg font-semibold">Vue 3</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Lenguaje</p>
+              <p class="mt-2 text-lg font-semibold">TypeScript</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <p class="text-sm uppercase tracking-[0.2em] text-slate-500">UI</p>
+              <p class="mt-2 text-lg font-semibold">Vuetify 4 + MDI</p>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Estado</p>
+              <p class="mt-2 text-lg font-semibold">Pinia</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-8 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-2xl font-bold">Enrutamiento y navegación</h2>
+        <div class="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p class="leading-7 text-slate-700">
+              Las rutas se definen en `src/router/routes.ts`. Cada ruta incluye `meta` con `title`,
+              `icon` y `showInNavigation`. El layout transforma estas rutas en elementos del menú lateral.
+              Además, `src/router/index.ts` actualiza el título del documento después de cada navegación.
+            </p>
+            <div class="mt-6 overflow-x-auto rounded-2xl bg-slate-950 p-5">
+              <pre class="text-sm leading-7 text-slate-300"><code>/
+/maestros
+/inventario
+/produccion
+  /produccion/unidades
+  /produccion/recetas
+  /produccion/productos
+/finanzas</code></pre>
+            </div>
+          </div>
+          <div class="rounded-2xl bg-slate-50 p-6">
+            <h3 class="text-lg font-semibold">Reglas observadas</h3>
+            <ul class="mt-4 space-y-3 text-slate-700">
+              <li>Las rutas principales con `showInNavigation: true` aparecen en el drawer lateral.</li>
+              <li>`/produccion` redirige automáticamente a `/produccion/unidades`.</li>
+              <li>Las vistas hijas de Producción no se listan en el menú lateral principal.</li>
+              <li>El título del navegador usa el formato `ERP Produccion | {pantalla}`.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-2">
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Layout principal</h2>
+          <ul class="mt-5 space-y-4 text-slate-700">
+            <li class="rounded-2xl bg-slate-50 p-4">Barra superior con botón para abrir/cerrar el menú lateral.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Drawer persistente controlado por `useAppStore`.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Contenedor `v-main` con `v-container` fluido para alojar las vistas.</li>
+            <li class="rounded-2xl bg-slate-50 p-4">Transición `fade` en el intercambio de pantallas con `router-view`.</li>
+          </ul>
+        </article>
+
+        <article class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <h2 class="text-2xl font-bold">Tema visual</h2>
+          <p class="mt-4 leading-7 text-slate-700">
+            `src/plugins/vuetify.ts` define un tema claro personalizado con fondo `#F8FAFC`, color
+            primario `#5568a5` y colores secundarios para estados de éxito, advertencia e información.
+            También fija defaults de componentes como `VCard`, `VTextField`, `VSelect`, `VBtn` y `VDataTable`.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <span class="rounded-full bg-[#5568a5] px-4 py-2 text-white">Primary</span>
+            <span class="rounded-full bg-[#38BDF8] px-4 py-2 text-slate-900">Accent</span>
+            <span class="rounded-full bg-[#10B981] px-4 py-2 text-white">Success</span>
+            <span class="rounded-full bg-[#F59E0B] px-4 py-2 text-white">Warning</span>
+            <span class="rounded-full bg-[#EF4444] px-4 py-2 text-white">Error</span>
+          </div>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>
